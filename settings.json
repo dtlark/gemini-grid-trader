@@ -1,0 +1,11 @@
+{
+  "LOGFILE":"messages.log",
+  "gemini_api_key":"",
+  "gemini_api_secret":"",
+  "sub_account":"sub_account name",
+  "grid_lines": 6,
+  "currencies": [{"symbol": "dogeusd",
+                  "upper_price": 0.1601,
+                  "lower_price": 0.1201
+                  }]
+}
