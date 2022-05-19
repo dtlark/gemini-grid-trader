@@ -70,31 +70,38 @@ def postHeartbeat(nonce):
     response = requests.post(base_url + "/v1/heartbeat", headers=getRequestHeaders(payload))
     return response.json
 
-if __name__ == '__main__':
+def main():
     print(config)
     print("\n")
 
     buy_orders = []
     sell_orders = []
 
+    for curr in currencies:
+        symbol = config[curr]["symbol"]
+        delta = (config[curr]["upper_price"] - config[curr]["lower_price"]) / config["grid_lines"]
+
+        try:
+            response = requests.get(f"https://api.gemini.com/v1/pubticker/{symbol}").json()
+            price = float(response['ask'])
+            print(price)
+        except Exception as e:
+            print(f"Request Failed: {e} \n Retrying...")
+            continue
+        
+        #create buy/sells
+        price = config[curr]["lower_price"];
+        for grid in config["grid_lines"]:
+            buy_orders.append(postNew(getNonce(), str(000), f"{symbol}", "0.1", 0.03))
+            price += delta
+
     whileLoop = True
 
+    #monitor
     while whileLoop:
 
         print(postHeartbeat(getNonce()))
-
-        for curr in currencies:
-            symbol = curr["symbol"]
-            delta = (curr["upper_price"] - curr["lower_price"]) / curr["grid_lines"]
-
-            try:
-                response = requests.get(f"https://api.gemini.com/v1/pubticker/{symbol}").json()
-                price = float(response['ask'])
-                print(price)
-            except Exception as e:
-                print(f"Request Failed: {e} \n Retrying...")
-                continue
-
-            buy_orders.append(postNew(getNonce(), str(000), f"{symbol}", "0.1", 0.03))
-
         sleep(15)
+
+if __name__ == '__main__':
+    main()
